@@ -138,6 +138,36 @@ The dashboard uses a **Bento Box** grid layout — `BoxWithConstraints` adapts t
 
 ---
 
+## Electronic PCR (E-PCR) — Pros & Cons
+
+### Pros
+
+| # | Benefit | Detail |
+|---|---|---|
+| 1 | **Legibility** | Typed entries eliminate handwriting errors, ambiguous abbreviations, and illegible drug dosages |
+| 2 | **Completeness checks** | Required-field validation prevents incomplete PCRs from being submitted — reducing QA rejections |
+| 3 | **Speed at billing** | Structured data feeds directly into billing software; reduces manual re-keying and claim denials |
+| 4 | **Real-time access** | Receiving hospitals can view the PCR before the unit arrives, allowing earlier preparation |
+| 5 | **Data analytics** | Aggregated records enable response-time analysis, protocol compliance audits, and outcomes research |
+| 6 | **Reduced storage** | No physical paper files; records are searchable and backed up in the cloud |
+| 7 | **NEMSIS compliance** | E-PCR systems export to the National EMS Information System standard automatically |
+| 8 | **Timestamps** | GPS + system clock auto-stamp dispatch, on-scene, and transport times — removes estimation bias |
+
+### Cons
+
+| # | Limitation | Detail |
+|---|---|---|
+| 1 | **Device dependency** | A dead battery, cracked screen, or software crash can halt documentation mid-call |
+| 2 | **Distraction risk** | Eyes on a screen instead of the patient during active care phases |
+| 3 | **Learning curve** | New providers require training time; mistakes in dropdown selection can be as harmful as bad handwriting |
+| 4 | **Data entry lag** | Complex interfaces can slow documentation compared to a paper form in high-acuity situations |
+| 5 | **Connectivity** | Sync to hospital or dispatch relies on cellular/Wi-Fi — poor signal areas lose real-time sharing benefit |
+| 6 | **Privacy & security** | PHI stored digitally requires HIPAA-compliant encryption, access controls, and breach response plans |
+| 7 | **Cost** | Hardware procurement, software licensing, and IT support add operational overhead |
+| 8 | **System downtime** | Server outages or app updates can force a temporary return to paper backup workflows |
+
+---
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.

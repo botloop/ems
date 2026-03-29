@@ -25,7 +25,8 @@ data class PcrFormState(
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
     val errorMessage: String? = null,
-    val selectedTab: Int = 0
+    val selectedTab: Int = 0,
+    val showFloatingGcs: Boolean = false
 )
 
 @HiltViewModel
@@ -62,6 +63,7 @@ class PcrViewModel @Inject constructor(
     }
 
     fun selectTab(index: Int) = _uiState.update { it.copy(selectedTab = index) }
+    fun toggleFloatingGcs() = _uiState.update { it.copy(showFloatingGcs = !it.showFloatingGcs) }
 
     // Response tab
     fun updateUnitNumber(v: String) = updatePcr { it.copy(unitNumber = v) }
@@ -71,16 +73,13 @@ class PcrViewModel @Inject constructor(
     fun setDispatchNow() = setTimedField(java.time.Instant.now()) { t -> updatePcr { it.copy(dispatchTime = t) } }
     fun setOnSceneNow() = setTimedField(java.time.Instant.now()) { t -> updatePcr { it.copy(onSceneTime = t) } }
     fun setTransportNow() = setTimedField(java.time.Instant.now()) { t -> updatePcr { it.copy(transportTime = t) } }
-
     fun setDispatchTime(hour: Int, minute: Int) = setTimedField(instantFromTime(hour, minute)) { t -> updatePcr { it.copy(dispatchTime = t) } }
     fun setOnSceneTime(hour: Int, minute: Int) = setTimedField(instantFromTime(hour, minute)) { t -> updatePcr { it.copy(onSceneTime = t) } }
     fun setTransportTime(hour: Int, minute: Int) = setTimedField(instantFromTime(hour, minute)) { t -> updatePcr { it.copy(transportTime = t) } }
 
     private fun instantFromTime(hour: Int, minute: Int): Instant =
-        java.time.LocalDate.now()
-            .atTime(hour, minute)
-            .atZone(java.time.ZoneId.systemDefault())
-            .toInstant()
+        java.time.LocalDate.now().atTime(hour, minute)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant()
 
     private fun setTimedField(instant: Instant, block: (Instant) -> Unit) = block(instant)
 
@@ -88,17 +87,23 @@ class PcrViewModel @Inject constructor(
     fun updateFirstName(v: String) = updatePcr { it.copy(patientFirstName = v) }
     fun updateLastName(v: String) = updatePcr { it.copy(patientLastName = v) }
     fun updateDob(v: String) {
-        updatePcr { it.copy(patientDob = v) }
-        computeAge(v)?.let { age -> updatePcr { it.copy(patientAge = age) } }
+        val digits = v.filter { it.isDigit() }.take(8)
+        val formatted = buildString {
+            digits.forEachIndexed { i, c ->
+                if (i == 2 || i == 4) append('/')
+                append(c)
+            }
+        }
+        val age = computeAge(formatted)
+        updatePcr { it.copy(patientDob = formatted, patientAge = age ?: if (formatted.isBlank()) null else it.patientAge) }
     }
     fun updateAge(v: String) = updatePcr { it.copy(patientAge = v.toIntOrNull()) }
 
     private fun computeAge(dob: String): Int? = try {
-        val date = java.time.LocalDate.parse(
-            dob, java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy")
-        )
+        val date = java.time.LocalDate.parse(dob, java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy"))
         java.time.Period.between(date, java.time.LocalDate.now()).years.takeIf { it in 0..130 }
     } catch (_: Exception) { null }
+
     fun updateGender(v: String) = updatePcr { it.copy(patientGender = v) }
     fun updatePatientAddress(v: String) = updatePcr { it.copy(patientAddress = v) }
     fun updatePhone(v: String) = updatePcr { it.copy(patientPhone = v) }
@@ -119,6 +124,7 @@ class PcrViewModel @Inject constructor(
     // Vitals tab
     fun addVitalSigns(vitals: VitalSigns) {
         viewModelScope.launch {
+            pcrRepository.savePcr(_uiState.value.pcr)
             val newVitals = vitals.copy(pcrId = _uiState.value.pcr.id, id = UUID.randomUUID().toString())
             vitalSignsRepository.saveVitalSigns(newVitals)
         }
@@ -126,6 +132,10 @@ class PcrViewModel @Inject constructor(
     fun deleteVitalSigns(id: String) {
         viewModelScope.launch { vitalSignsRepository.deleteVitalSigns(id) }
     }
+
+    // Treatment tab
+    fun updateTreatmentNotes(v: String) = updatePcr { it.copy(treatmentNotes = v) }
+    fun updateMedicationsGiven(v: String) = updatePcr { it.copy(medicationsGiven = v) }
 
     // Disposition tab
     fun updateTransportDestination(v: String) = updatePcr { it.copy(transportDestination = v) }
@@ -136,10 +146,7 @@ class PcrViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
             try {
-                val pcr = _uiState.value.pcr.copy(
-                    updatedAt = Instant.now(),
-                    status = PcrStatus.COMPLETE
-                )
+                val pcr = _uiState.value.pcr.copy(updatedAt = Instant.now(), status = PcrStatus.COMPLETE)
                 pcrRepository.savePcr(pcr)
                 _uiState.update { it.copy(isSaving = false, isSaved = true, pcr = pcr) }
             } catch (e: Exception) {

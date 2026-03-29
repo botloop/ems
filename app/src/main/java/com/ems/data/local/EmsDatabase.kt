@@ -9,7 +9,7 @@ import com.ems.data.local.entity.VitalSignsEntity
 
 @Database(
     entities = [PcrEntity::class, VitalSignsEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class EmsDatabase : RoomDatabase() {

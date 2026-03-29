@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.*
@@ -101,7 +102,10 @@ fun ClinicalTab(state: PcrFormState, viewModel: PcrViewModel) {
         SectionHeader("Chief Complaint & Mechanism")
         LabeledTextField("Chief Complaint", state.pcr.chiefComplaint, viewModel::updateChiefComplaint,
             placeholder = "Patient's primary complaint in their own words")
-        LabeledTextField("Mechanism of Injury / Nature of Illness", state.pcr.mechanismOfInjury, viewModel::updateMechanism)
+        MoiDropdown(
+            selected = state.pcr.mechanismOfInjury,
+            onSelect = viewModel::updateMechanism
+        )
 
         SectionHeader("Level of Consciousness")
         val locOptions = listOf("Alert", "Verbal", "Pain", "Unresponsive")
@@ -173,6 +177,115 @@ private fun NarrativeSection(
                 Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(4.dp))
                 Text("Copy", style = MaterialTheme.typography.labelMedium)
+            }
+        }
+    }
+}
+
+// ── MOI / Nature of Illness Dropdown ─────────────────────────────────────────
+
+private val moiOptions = listOf(
+    "— Select —",
+    // Medical
+    "Chest Pain / Cardiac",
+    "Respiratory Distress",
+    "Altered Mental Status",
+    "Stroke / CVA",
+    "Seizure",
+    "Diabetic Emergency",
+    "Allergic Reaction / Anaphylaxis",
+    "Abdominal Pain",
+    "OB/Gyn Emergency",
+    "Behavioral / Psychiatric",
+    "Poisoning / Overdose",
+    "Cardiac Arrest",
+    "Syncope / Near-Syncope",
+    "Other Medical",
+    // Trauma
+    "Motor Vehicle Collision (MVC)",
+    "Motorcycle Crash",
+    "Pedestrian vs Vehicle",
+    "Fall from Height",
+    "Ground Level Fall",
+    "Assault / Battery",
+    "Stab / Penetrating Trauma",
+    "Gunshot Wound (GSW)",
+    "Burns",
+    "Crush Injury",
+    "Sports Injury",
+    "Industrial Accident",
+    "Blast / Explosion",
+    "Other Trauma"
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MoiDropdown(selected: String, onSelect: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val displayValue = selected.ifBlank { "Select mechanism / nature of illness" }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        OutlinedTextField(
+            value = displayValue,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Mechanism of Injury / Nature of Illness") },
+            trailingIcon = {
+                Icon(
+                    Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    tint = ClinicalBlue
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor()
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            moiOptions.forEachIndexed { index, option ->
+                if (index == 0) {
+                    // Separator label
+                    DropdownMenuItem(
+                        text = { Text(option, color = SubtleText, style = MaterialTheme.typography.labelSmall) },
+                        onClick = {},
+                        enabled = false
+                    )
+                } else {
+                    val isSectionHeader = option.startsWith("Other Medical") || option.startsWith("Motor Vehicle")
+                    if (option == "Motor Vehicle Collision (MVC)") {
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    "— Trauma Mechanisms —",
+                                    color = SubtleText,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            onClick = {},
+                            enabled = false
+                        )
+                    }
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                option,
+                                color = if (selected == option) ClinicalBlue else MaterialTheme.colorScheme.onSurface,
+                                fontWeight = if (selected == option) FontWeight.SemiBold else FontWeight.Normal
+                            )
+                        },
+                        onClick = {
+                            onSelect(option)
+                            expanded = false
+                        }
+                    )
+                }
             }
         }
     }

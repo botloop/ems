@@ -40,6 +40,10 @@ data class Pcr(
     val positionFound: String = "",
     val pertinentNegatives: String = "",
 
+    // Treatment (tab 4)
+    val treatmentNotes: String = "",
+    val medicationsGiven: String = "",   // pipe-delimited: "Drug|Dose|Route|Time"
+
     // Disposition
     val transportDestination: String = "",
     val patientConditionOnArrival: String = "",

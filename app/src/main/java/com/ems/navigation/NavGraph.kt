@@ -3,8 +3,14 @@ package com.ems.navigation
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Assignment
+import androidx.compose.material.icons.outlined.Calculate
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,15 +47,16 @@ fun NavGraph() {
     )
 
     Scaffold(
+        contentWindowInsets = WindowInsets.ime,
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar {
                     val items = listOf(
-                        Triple(Screen.Dashboard, "Dashboard", Icons.Filled.Home),
-                        Triple(Screen.Assessment, "Assessment", Icons.Filled.Assignment),
-                        Triple(Screen.PcrList, "PCR", Icons.Filled.Description),
-                        Triple(Screen.GcsCalculator, "Calc", Icons.Filled.Calculate),
-                        Triple(Screen.Mnemonics, "Mnemonics", Icons.Filled.MenuBook)
+                        Triple(Screen.Dashboard, "Dashboard", Icons.Outlined.Home),
+                        Triple(Screen.Assessment, "Assess", Icons.Outlined.Assignment),
+                        Triple(Screen.PcrList, "PCR", Icons.Outlined.Description),
+                        Triple(Screen.GcsCalculator, "Calc", Icons.Outlined.Calculate),
+                        Triple(Screen.Mnemonics, "Mnemonics", Icons.Outlined.MenuBook)
                     )
                     items.forEach { (screen, label, icon) ->
                         NavigationBarItem(

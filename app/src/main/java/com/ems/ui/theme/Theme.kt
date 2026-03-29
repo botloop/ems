@@ -16,44 +16,46 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+// Light — Salt and Pepper: white ground, pepper accents
 private val LightColorScheme = lightColorScheme(
-    primary = ClinicalBlue,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFE3F2FD),
-    onPrimaryContainer = ClinicalBlueDark,
-    secondary = Color(0xFF0097A7),
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE0F7FA),
-    onSecondaryContainer = Color(0xFF004D5E),
-    error = EmergencyRed,
-    onError = Color.White,
-    errorContainer = EmergencyRedContainer,
-    onErrorContainer = Color(0xFF8B1A10),
-    background = CleanWhite,
-    onBackground = PrimaryText,
-    surface = Color.White,
-    onSurface = PrimaryText,
-    surfaceVariant = SurfaceGray,
-    onSurfaceVariant = SubtleText,
-    outline = DividerGray,
+    primary            = Pepper,
+    onPrimary          = Salt,
+    primaryContainer   = PepperMid,
+    onPrimaryContainer = PepperDark,
+    secondary          = PepperLight,
+    onSecondary        = Salt,
+    secondaryContainer = PepperMid,
+    onSecondaryContainer = Pepper,
+    error              = EmergencyRed,
+    onError            = Salt,
+    errorContainer     = EmergencyRedContainer,
+    onErrorContainer   = Color(0xFF8B1A10),
+    background         = Salt,
+    onBackground       = Pepper,
+    surface            = Salt,
+    onSurface          = Pepper,
+    surfaceVariant     = PepperMid,
+    onSurfaceVariant   = Pepper,
+    outline            = PepperLight,
 )
 
+// Dark — inverted: pepper ground, salt accents
 private val DarkColorScheme = darkColorScheme(
-    primary = ClinicalBlueLight,
-    onPrimary = Color.White,
-    primaryContainer = ClinicalBlueDark,
-    onPrimaryContainer = Color(0xFFBBDEFB),
-    secondary = Color(0xFF00BCD4),
-    onSecondary = Color.Black,
-    error = EmergencyRedLight,
-    onError = Color.Black,
-    background = DarkBackground,
-    onBackground = Color.White,
-    surface = DarkSurface,
-    onSurface = Color.White,
-    surfaceVariant = DarkCard,
-    onSurfaceVariant = Color(0xFFB0B0B0),
-    outline = DarkDivider,
+    primary            = PepperMid,
+    onPrimary          = PepperDark,
+    primaryContainer   = PepperDark,
+    onPrimaryContainer = PepperMid,
+    secondary          = PepperLight,
+    onSecondary        = PepperDark,
+    error              = EmergencyRedLight,
+    onError            = Color.Black,
+    background         = DarkBackground,
+    onBackground       = Salt,
+    surface            = DarkSurface,
+    onSurface          = Salt,
+    surfaceVariant     = DarkCard,
+    onSurfaceVariant   = PepperMid,
+    outline            = DarkDivider,
 )
 
 @Composable
@@ -75,7 +77,7 @@ fun EmsTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            window.statusBarColor = colorScheme.background.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }

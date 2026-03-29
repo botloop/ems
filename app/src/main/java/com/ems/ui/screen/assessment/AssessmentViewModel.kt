@@ -9,11 +9,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+enum class CaseType { MEDICAL, TRAUMA }
+
 data class AssessmentUiState(
     val assessment: PatientAssessment = PatientAssessment(),
     val penmanChecks: List<PenmanCheck> = penmanItems.map { it.copy() },
     val currentStep: AssessmentStep = AssessmentStep.SCENE_SIZE_UP,
-    val isStepComplete: Boolean = false
+    val isStepComplete: Boolean = false,
+    val caseType: CaseType = CaseType.MEDICAL
 )
 
 @HiltViewModel
@@ -95,6 +98,10 @@ class AssessmentViewModel @Inject constructor() : ViewModel() {
                 )
             )
         }
+    }
+
+    fun setCaseType(type: CaseType) {
+        _uiState.update { it.copy(caseType = type) }
     }
 
     fun resetAssessment() {

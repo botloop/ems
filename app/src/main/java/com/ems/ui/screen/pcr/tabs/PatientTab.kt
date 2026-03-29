@@ -9,6 +9,8 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.ems.ui.components.LabeledTextField
 import com.ems.ui.components.SectionHeader
@@ -30,12 +32,15 @@ fun PatientTab(state: PcrFormState, viewModel: PcrViewModel) {
             LabeledTextField("Last Name", state.pcr.patientLastName, viewModel::updateLastName, modifier = Modifier.weight(1f))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            LabeledTextField(
-                label = "Date of Birth",
+            OutlinedTextField(
                 value = state.pcr.patientDob,
                 onValueChange = viewModel::updateDob,
+                label = { Text("Date of Birth") },
+                placeholder = { Text("MM/DD/YYYY") },
                 modifier = Modifier.weight(1f),
-                placeholder = "MM/DD/YYYY"
+                singleLine = true,
+                shape = RoundedCornerShape(10.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             // Age — auto-computed from DOB; falls back to manual entry
             val ageAutoComputed = state.pcr.patientDob.isNotBlank() && state.pcr.patientAge != null

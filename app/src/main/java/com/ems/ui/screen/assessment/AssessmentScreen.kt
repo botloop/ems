@@ -1,8 +1,11 @@
 package com.ems.ui.screen.assessment
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -10,13 +13,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ems.domain.model.AssessmentStep
 import com.ems.domain.model.penmanItems
+import com.ems.ui.screen.assessment.CaseType
 import com.ems.ui.components.*
 import com.ems.ui.theme.*
 
@@ -50,26 +57,35 @@ fun AssessmentScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Progress bar
-            AssessmentProgressBar(
-                currentStep = state.currentStep,
+            // Medical / Trauma toggle
+            CaseTypeToggle(
+                selected = state.caseType,
+                onSelect = { viewModel.setCaseType(it) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
+            // Progress bar
+            AssessmentProgressBar(
+                currentStep = state.currentStep,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
+            )
+
             // Step content
             AnimatedContent(
-                targetState = state.currentStep,
+                targetState = state.currentStep to state.caseType,
                 transitionSpec = {
-                    if (targetState.index > initialState.index) {
+                    if (targetState.first.index > initialState.first.index) {
                         slideInHorizontally { it } + fadeIn() togetherWith slideOutHorizontally { -it } + fadeOut()
                     } else {
                         slideInHorizontally { -it } + fadeIn() togetherWith slideOutHorizontally { it } + fadeOut()
                     }
                 },
                 label = "step_content"
-            ) { step ->
+            ) { (step, caseType) ->
                 when (step) {
                     AssessmentStep.SCENE_SIZE_UP -> SceneSizeUpStep(
                         checks = state.penmanChecks,
@@ -88,6 +104,7 @@ fun AssessmentScreen(
                         onBack = { viewModel.goToPreviousStep() }
                     )
                     AssessmentStep.PRIMARY_SURVEY -> PrimarySurveyStep(
+                        caseType = caseType,
                         onNext = { viewModel.proceedToNextStep() },
                         onBack = { viewModel.goToPreviousStep() }
                     )
@@ -119,6 +136,59 @@ fun AssessmentScreen(
         }
     }
 }
+
+// ── Medical / Trauma Toggle ───────────────────────────────────────────────────
+
+@Composable
+private fun CaseTypeToggle(
+    selected: CaseType,
+    onSelect: (CaseType) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val activeBlue = Color(0xFF0984E3)
+    val inactiveBg = Color(0xFFF3F4F6)
+
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(inactiveBg)
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        CaseType.entries.forEach { type ->
+            val isSelected = selected == type
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(if (isSelected) activeBlue else Color.Transparent)
+                    .clickable { onSelect(type) }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = if (type == CaseType.MEDICAL) Icons.Filled.LocalHospital else Icons.Filled.PersonSearch,
+                        contentDescription = null,
+                        tint = if (isSelected) Color.White else Color(0xFF9CA3AF),
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Text(
+                        text = if (type == CaseType.MEDICAL) "Medical" else "Trauma",
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        fontSize = 14.sp,
+                        color = if (isSelected) Color.White else Color(0xFF6B7280)
+                    )
+                }
+            }
+        }
+    }
+}
+
+// ── Progress Bar ──────────────────────────────────────────────────────────────
 
 @Composable
 private fun AssessmentProgressBar(currentStep: AssessmentStep, modifier: Modifier = Modifier) {
@@ -224,19 +294,40 @@ private fun InitialAssessmentStep(onNext: () -> Unit, onBack: () -> Unit) {
 }
 
 @Composable
-private fun PrimarySurveyStep(onNext: () -> Unit, onBack: () -> Unit) {
+private fun PrimarySurveyStep(caseType: CaseType, onNext: () -> Unit, onBack: () -> Unit) {
     AssessmentStepLayout(
         title = "Primary Survey (ABCDE)",
         description = "Rapidly identify and treat life threats.",
         onNext = onNext, onBack = onBack
     ) {
-        listOf(
-            "A — Airway: Assess and secure patent airway",
-            "B — Breathing: Assess breath sounds, rate, effort; apply O₂ as needed",
-            "C — Circulation: Control major hemorrhage, assess perfusion",
+        // Adaptive banner
+        val bannerColor = if (caseType == CaseType.TRAUMA) Color(0xFFEF4444) else Color(0xFF0984E3)
+        val bannerLabel = if (caseType == CaseType.TRAUMA) "TRAUMA — prioritize hemorrhage control & spinal motion restriction" else "MEDICAL — prioritize airway, O₂, and glucose"
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(bannerColor.copy(alpha = 0.1f))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            Text(bannerLabel, fontSize = 12.sp, color = bannerColor, fontWeight = FontWeight.SemiBold)
+        }
+        Spacer(Modifier.height(4.dp))
+
+        val items = if (caseType == CaseType.TRAUMA) listOf(
+            "A — Airway: C-spine neutral; jaw thrust if needed",
+            "B — Breathing: Expose chest; seal open wounds; assess bilateral breath sounds",
+            "C — Circulation: Control major hemorrhage (tourniquet / wound packing)",
+            "D — Disability: GCS, pupils, gross motor/sensory check",
+            "E — Exposure: Expose all injuries; prevent hypothermia (blanket)"
+        ) else listOf(
+            "A — Airway: Open and maintain; OPA/NPA if needed",
+            "B — Breathing: Rate, depth, effort; apply O₂ (NRB 15 L/min)",
+            "C — Circulation: Radial pulse quality; skin color/temp/moisture",
             "D — Disability: GCS, pupils, blood glucose if altered LOC",
-            "E — Exposure/Environment: Expose injury areas; prevent hypothermia"
-        ).forEach { ChecklistItem(text = it) }
+            "E — Environment: Remove from hazard; comfort positioning"
+        )
+        items.forEach { ChecklistItem(text = it) }
     }
 }
 

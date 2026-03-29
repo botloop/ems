@@ -1,6 +1,5 @@
 package com.ems.ui.screen.welcome
 
-import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,8 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -20,15 +19,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
 import com.ems.R
-import com.ems.ui.theme.ClinicalBlue
-import com.ems.ui.theme.ClinicalBlueDark
 import kotlinx.coroutines.delay
 
 @Composable
 fun WelcomeScreen(onFinished: () -> Unit) {
     val context = LocalContext.current
 
-    // Fade-in for text elements
     var textVisible by remember { mutableStateOf(false) }
     val textAlpha by animateFloatAsState(
         targetValue = if (textVisible) 1f else 0f,
@@ -36,64 +32,63 @@ fun WelcomeScreen(onFinished: () -> Unit) {
         label = "text_fade"
     )
 
-    // Auto-advance after 3.5 s
     LaunchedEffect(Unit) {
         delay(300)
         textVisible = true
-        delay(3200)
+        delay(14_800)
         onFinished()
     }
 
+    // White background
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(ClinicalBlueDark, ClinicalBlue, Color(0xFF2196F3))
-                )
-            ),
-        contentAlignment = Alignment.Center
+            .background(Color.White)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(0.dp)
-        ) {
-            // Animated GIF
-            AsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(R.drawable.anim_3d)
-                    .size(Size.ORIGINAL)
-                    .build(),
-                contentDescription = "EMS animation",
-                modifier = Modifier.size(260.dp)
-            )
+        // GIF fills the full screen as a background layer
+        AsyncImage(
+            model = ImageRequest.Builder(context)
+                .data(R.drawable.anim_3d)
+                .size(Size.ORIGINAL)
+                .build(),
+            contentDescription = "EMS animation",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
 
-            // App name + tagline
+        // Text overlay anchored to the bottom — dark text on white-ish bg
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(textAlpha),
+            contentAlignment = Alignment.BottomCenter
+        ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .alpha(textAlpha)
-                    .padding(horizontal = 32.dp)
+                    .fillMaxWidth()
+                    .background(Color.White.copy(alpha = 0.88f))
+                    .padding(horizontal = 32.dp, vertical = 28.dp)
             ) {
                 Text(
                     text = "EMS PCR",
                     fontSize = 40.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.White,
+                    color = Color(0xFF1A1A1A),   // dark text on white
                     letterSpacing = 2.sp
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = "Patient Assessment &\nCare Reporting",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White.copy(alpha = 0.85f),
+                    color = Color(0xFF2B2B2B).copy(alpha = 0.75f),
                     textAlign = TextAlign.Center,
                     lineHeight = 24.sp
                 )
                 Spacer(Modifier.height(16.dp))
                 HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(0.4f),
-                    color = Color.White.copy(alpha = 0.3f),
+                    color = Color(0xFF1A1A1A).copy(alpha = 0.2f),
                     thickness = 1.dp
                 )
                 Spacer(Modifier.height(12.dp))
@@ -101,28 +96,23 @@ fun WelcomeScreen(onFinished: () -> Unit) {
                     text = "EMS · TWSP Batch 12",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
+                    color = Color(0xFF1A1A1A),
                     textAlign = TextAlign.Center,
                     letterSpacing = 1.sp
                 )
-                Spacer(Modifier.height(32.dp))
-
-                // Progress indicator
+                Spacer(Modifier.height(24.dp))
                 LinearProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth(0.5f)
                         .height(3.dp),
-                    color = Color.White,
-                    trackColor = Color.White.copy(alpha = 0.25f)
+                    color = Color(0xFF1A1A1A),
+                    trackColor = Color(0xFF1A1A1A).copy(alpha = 0.15f)
                 )
-
-                Spacer(Modifier.height(20.dp))
-
-                // Skip button
+                Spacer(Modifier.height(16.dp))
                 TextButton(onClick = onFinished) {
                     Text(
                         "Skip",
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = Color(0xFF1A1A1A).copy(alpha = 0.5f),
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
