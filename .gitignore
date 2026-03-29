@@ -1,0 +1,48 @@
+# Android / Gradle
+.gradle/
+build/
+app/build/
+captures/
+*.hprof
+*.apk
+*.aab
+local.properties
+.cxx/
+
+# Android Studio / IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.DS_Store
+
+# Kotlin generated
+/kotlin/
+app/.kotlin/
+
+# Room schema exports (keep if you want migration history, else ignore)
+# app/schemas/
+
+# Signing keystores (NEVER commit these)
+*.jks
+*.keystore
+release.properties
+keystore.properties
+
+# Firebase config — contains API keys, excluded from public repo
+# Add via CI secrets or local file for builds
+google-services.json
+app/google-services.json
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Node / npm (if any tooling)
+node_modules/
+
+# Test results
+test-results/
+*.xml.bak

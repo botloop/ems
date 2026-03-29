@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EMS PCR</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_assessment">Assessment</string>
+    <string name="nav_pcr">PCR</string>
+    <string name="nav_calculators">Calculators</string>
+    <string name="nav_mnemonics">Mnemonics</string>
+
+    <!-- Assessment -->
+    <string name="scene_size_up">Scene Size-Up</string>
+    <string name="penman_title">PENMAN Safety Check</string>
+    <string name="penman_proceed">Proceed to Initial Assessment</string>
+    <string name="assessment_progress">Assessment Progress</string>
+
+    <!-- PCR Tabs -->
+    <string name="tab_response">Response</string>
+    <string name="tab_patient">Patient</string>
+    <string name="tab_clinical">Clinical</string>
+    <string name="tab_vitals">Vitals</string>
+    <string name="tab_disposition">Disposition</string>
+
+    <!-- GCS -->
+    <string name="gcs_title">Glasgow Coma Scale</string>
+    <string name="gcs_eyes">Eye Opening</string>
+    <string name="gcs_verbal">Verbal Response</string>
+    <string name="gcs_motor">Motor Response</string>
+    <string name="gcs_total">Total GCS Score</string>
+    <string name="gcs_critical_warning">CRITICAL: GCS ≤ 8 — Consider airway management</string>
+
+    <!-- Vitals -->
+    <string name="vitals_title">Vital Signs</string>
+    <string name="vitals_bp">Blood Pressure (mmHg)</string>
+    <string name="vitals_hr">Heart Rate (bpm)</string>
+    <string name="vitals_rr">Respiratory Rate (/min)</string>
+    <string name="vitals_spo2">SpO₂ (%)</string>
+    <string name="vitals_shock_index">Shock Index</string>
+    <string name="vitals_shock_critical">CRITICAL: Shock Index &gt; 0.9</string>
+
+    <!-- Mnemonics -->
+    <string name="mnemonics_title">Clinical Mnemonics</string>
+    <string name="copy_to_pcr">Copy to PCR</string>
+    <string name="copied_to_pcr">Copied to PCR narrative</string>
+</resources>
