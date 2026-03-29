@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ems.ui.screen.assessment.AssessmentScreen
 import com.ems.ui.screen.dashboard.DashboardScreen
+import com.ems.ui.screen.welcome.WelcomeScreen
 import com.ems.ui.screen.gcs.GcsScreen
 import com.ems.ui.screen.mnemonics.MnemonicsScreen
 import com.ems.ui.screen.pcr.PcrDetailScreen
@@ -68,9 +69,21 @@ fun NavGraph() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Dashboard.route,
+            startDestination = Screen.Welcome.route,
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable(
+                route = Screen.Welcome.route,
+                exitTransition = { fadeOut(tween(600)) }
+            ) {
+                WelcomeScreen(
+                    onFinished = {
+                        navController.navigate(Screen.Dashboard.route) {
+                            popUpTo(Screen.Welcome.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
                     onNavigateToAssessment = { navController.navigate(Screen.Assessment.route) },

@@ -1,6 +1,7 @@
 package com.ems.navigation
 
 sealed class Screen(val route: String) {
+    data object Welcome : Screen("welcome")
     data object Dashboard : Screen("dashboard")
     data object Assessment : Screen("assessment")
     data object PcrList : Screen("pcr_list")
