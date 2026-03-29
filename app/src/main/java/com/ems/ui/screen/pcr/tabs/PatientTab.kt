@@ -2,7 +2,10 @@ package com.ems.ui.screen.pcr.tabs
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -27,8 +30,37 @@ fun PatientTab(state: PcrFormState, viewModel: PcrViewModel) {
             LabeledTextField("Last Name", state.pcr.patientLastName, viewModel::updateLastName, modifier = Modifier.weight(1f))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            LabeledTextField("Date of Birth", state.pcr.patientDob, viewModel::updateDob, modifier = Modifier.weight(1f), placeholder = "MM/DD/YYYY")
-            LabeledTextField("Age", state.pcr.patientAge?.toString() ?: "", viewModel::updateAge, modifier = Modifier.weight(1f))
+            LabeledTextField(
+                label = "Date of Birth",
+                value = state.pcr.patientDob,
+                onValueChange = viewModel::updateDob,
+                modifier = Modifier.weight(1f),
+                placeholder = "MM/DD/YYYY"
+            )
+            // Age — auto-computed from DOB; falls back to manual entry
+            val ageAutoComputed = state.pcr.patientDob.isNotBlank() && state.pcr.patientAge != null
+            OutlinedTextField(
+                value = state.pcr.patientAge?.toString() ?: "",
+                onValueChange = viewModel::updateAge,
+                label = { Text("Age") },
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                readOnly = ageAutoComputed,
+                shape = RoundedCornerShape(10.dp),
+                trailingIcon = {
+                    if (ageAutoComputed) {
+                        Icon(
+                            Icons.Filled.AutoAwesome,
+                            contentDescription = "Auto-computed",
+                            tint = com.ems.ui.theme.ClinicalBlue,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                },
+                supportingText = if (ageAutoComputed) {
+                    { Text("From DOB", style = MaterialTheme.typography.labelSmall, color = com.ems.ui.theme.ClinicalBlue) }
+                } else null
+            )
         }
 
         // Gender selection

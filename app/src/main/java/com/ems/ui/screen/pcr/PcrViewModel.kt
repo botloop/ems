@@ -68,15 +68,37 @@ class PcrViewModel @Inject constructor(
     fun updateIncidentNumber(v: String) = updatePcr { it.copy(incidentNumber = v) }
     fun updateCallType(v: String) = updatePcr { it.copy(callType = v) }
     fun updateIncidentAddress(v: String) = updatePcr { it.copy(incidentAddress = v) }
-    fun setDispatchNow() = updatePcr { it.copy(dispatchTime = Instant.now()) }
-    fun setOnSceneNow() = updatePcr { it.copy(onSceneTime = Instant.now()) }
-    fun setTransportNow() = updatePcr { it.copy(transportTime = Instant.now()) }
+    fun setDispatchNow() = setTimedField(java.time.Instant.now()) { t -> updatePcr { it.copy(dispatchTime = t) } }
+    fun setOnSceneNow() = setTimedField(java.time.Instant.now()) { t -> updatePcr { it.copy(onSceneTime = t) } }
+    fun setTransportNow() = setTimedField(java.time.Instant.now()) { t -> updatePcr { it.copy(transportTime = t) } }
+
+    fun setDispatchTime(hour: Int, minute: Int) = setTimedField(instantFromTime(hour, minute)) { t -> updatePcr { it.copy(dispatchTime = t) } }
+    fun setOnSceneTime(hour: Int, minute: Int) = setTimedField(instantFromTime(hour, minute)) { t -> updatePcr { it.copy(onSceneTime = t) } }
+    fun setTransportTime(hour: Int, minute: Int) = setTimedField(instantFromTime(hour, minute)) { t -> updatePcr { it.copy(transportTime = t) } }
+
+    private fun instantFromTime(hour: Int, minute: Int): Instant =
+        java.time.LocalDate.now()
+            .atTime(hour, minute)
+            .atZone(java.time.ZoneId.systemDefault())
+            .toInstant()
+
+    private fun setTimedField(instant: Instant, block: (Instant) -> Unit) = block(instant)
 
     // Patient tab
     fun updateFirstName(v: String) = updatePcr { it.copy(patientFirstName = v) }
     fun updateLastName(v: String) = updatePcr { it.copy(patientLastName = v) }
-    fun updateDob(v: String) = updatePcr { it.copy(patientDob = v) }
+    fun updateDob(v: String) {
+        updatePcr { it.copy(patientDob = v) }
+        computeAge(v)?.let { age -> updatePcr { it.copy(patientAge = age) } }
+    }
     fun updateAge(v: String) = updatePcr { it.copy(patientAge = v.toIntOrNull()) }
+
+    private fun computeAge(dob: String): Int? = try {
+        val date = java.time.LocalDate.parse(
+            dob, java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy")
+        )
+        java.time.Period.between(date, java.time.LocalDate.now()).years.takeIf { it in 0..130 }
+    } catch (_: Exception) { null }
     fun updateGender(v: String) = updatePcr { it.copy(patientGender = v) }
     fun updatePatientAddress(v: String) = updatePcr { it.copy(patientAddress = v) }
     fun updatePhone(v: String) = updatePcr { it.copy(patientPhone = v) }
