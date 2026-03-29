@@ -82,13 +82,28 @@ fun WelcomeScreen(onFinished: () -> Unit) {
                     color = Color.White,
                     letterSpacing = 2.sp
                 )
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(
                     text = "Patient Assessment &\nCare Reporting",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White.copy(alpha = 0.85f),
                     textAlign = TextAlign.Center,
                     lineHeight = 24.sp
+                )
+                Spacer(Modifier.height(16.dp))
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(0.4f),
+                    color = Color.White.copy(alpha = 0.3f),
+                    thickness = 1.dp
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = "EMS · TWSP Batch 12",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 1.sp
                 )
                 Spacer(Modifier.height(32.dp))
 
